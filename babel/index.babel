@@ -1,0 +1,116 @@
+
+//REACT__________________________________________________________________--
+
+
+//QUOTE CARD WITH QUOTE______________________________________________________
+class Card extends React.Component{ 
+   constructor(props){
+     super(props);
+     this.copyText = this.copyText.bind(this);
+  }
+  
+  //copy Quote-------------------------------------
+  copyText(){
+     var copyText = document.getElementById("text");
+     var $temp = $("<input>");//create temporary input 
+     $("body").append($temp); //append it to document body
+     $temp.val($(copyText).text()).select(); //copy the quote and append to input , then select the text
+     document.execCommand("copy");//copy the selected text
+     $temp.remove();//remove the temporary input
+    $('.tooltiptext').css({visibility: 'visible', opacity: 1}); //display copied tooltip text
+    
+    //hide tooltip after 1s
+    setTimeout(function() {
+        $('.tooltiptext').css({visibility: 'hidden', opacity: 0});
+      }, 1000);   
+   }
+  
+  render(){
+    return (
+      <div className="card">
+        <div id='Q'>Q</div>
+        <div id="text">Too many of us are not living our dreams because we are living our fears.
+          </div>
+         <div id='subs'>
+            <i id="copy-quote" class="fa fa-clipboard faa-tada animated-hover" onClick={this.copyText} aria-hidden="true"></i><span class="tooltiptext">Copied!</span>
+           <div id='author'>Les Brown</div> 
+        </div>
+        <button id="new-quote">New  Quote</button>
+      </div>
+    )
+  }
+}
+//----------------------------------------------------------------------------
+
+//Wrapper for quote card___________________________________________________
+class Wrapper extends React.Component{
+  render(){
+    return (
+      <div className="card-wrapper">
+        <Card />
+      </div>
+    )
+  }
+}
+//------------------------------------------------------------------------
+
+//Container for quote box_________________________________________________
+class Container extends React.Component{
+  render() {
+    return(
+      <div>
+        <div  id="container">
+           <Wrapper id="quote-box" />
+        </div>
+     </div>
+    )
+  }
+}
+//--------------------------------------------------------------------------
+
+
+//render the app ____________________________________________________________________
+ReactDOM.render(<Container />, document.getElementById("app"));
+
+
+
+//jQuery and Ajax for api calls_______________________________________________________
+document.addEventListener('DOMContentLoaded', function(){
+  document.getElementById('new-quote').onclick = function(){
+    //making request to database--------
+     req = new XMLHttpRequest();
+     req.open('GET', 'https://gist.githubusercontent.com/camperbot/5a022b72e96c4c9585c32bf6a75f62d9/raw/e3c6895ce42069f0ee7e991229064f167fe8ccdc/quotes.json', true);
+    req.send();
+    
+    //processing data retreived--------------
+    req.onload = function(){
+      json = JSON.parse(req.responseText);
+      quotesData = json.quotes;
+      randomQuote = quotesData[Math.floor(Math.random() * quotesData.length)];
+      currentQuote = randomQuote.quote;
+      currentAuthor = randomQuote.author;
+    }
+    
+    //animation and setting new quote---------------------------------------
+    $("#text, #author, #copy-quote, .card-wrapper").animate(
+    { opacity: 0 },
+    2000,
+    function() {
+      $(this).animate({ opacity: 1}, 2000);
+      $('#text').text(currentQuote);
+       $('#author').html(currentAuthor);
+    }
+  );
+    
+    
+    //disable the button during change----------------------------------
+    document.getElementById('new-quote').disabled =  true;
+    
+    //reenable the button after animation------------------------------
+    setTimeout(function() {
+        document.getElementById('new-quote').disabled =  false;
+      }, 4000);
+  
+    
+  }
+});
