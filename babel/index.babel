@@ -81,7 +81,7 @@ document.addEventListener('DOMContentLoaded', function(){
      req = new XMLHttpRequest();
      req.open('GET', 'https://gist.githubusercontent.com/camperbot/5a022b72e96c4c9585c32bf6a75f62d9/raw/e3c6895ce42069f0ee7e991229064f167fe8ccdc/quotes.json', true);
     req.send();
-    
+    currentQuote = '';
     //processing data retreived--------------
     req.onload = function(){
       json = JSON.parse(req.responseText);
@@ -90,15 +90,22 @@ document.addEventListener('DOMContentLoaded', function(){
       currentQuote = randomQuote.quote;
       currentAuthor = randomQuote.author;
     }
-    
     //animation and setting new quote---------------------------------------
     $("#text, #author, #copy-quote, .card-wrapper").animate(
     { opacity: 0 },
     2000,
     function() {
-      $(this).animate({ opacity: 1}, 2000);
-      $('#text').text(currentQuote);
-       $('#author').html(currentAuthor);
+         $(this).animate({ opacity: 1}, 2000);
+         if(currentQuote == ''){
+            $('#subs, #Q, #new-quote').css({opacity: 0});
+           error = 'Oops! An error has occured ☹️.Please reload the page and try again.';
+           $('#text').text(error);
+         }
+      else{
+         $('#text').text(currentQuote);
+         $('#author').html(currentAuthor);
+      }
+        
     }
   );
     
